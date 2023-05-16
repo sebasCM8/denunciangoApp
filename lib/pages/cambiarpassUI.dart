@@ -42,7 +42,7 @@ class _CambiarPassUIState extends State<CambiarPassUI> {
     } catch (e) {
       result = ResponseResult.full(false, "Excepcion: $e");
     }
-    return result;
+    return Future.delayed(const Duration(seconds: 1), () => result);
   }
 
   Future<void> cambiarPassBtn() async {
@@ -95,9 +95,17 @@ class _CambiarPassUIState extends State<CambiarPassUI> {
       ),
       body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         inputOne(_passCtrl, "Contraseña....", 50),
-        inputOne(_passCtrl, "Confirmar contraseña..", 50),
-        ElevatedButton(
-            onPressed: cambiarPassBtn, child: const Text("CONFIRMAR"))
+        inputOne(_rePassCtrl, "Confirmar contraseña..", 50),
+        if (!_loading)
+          ElevatedButton(
+              onPressed: cambiarPassBtn, child: const Text("CONFIRMAR")),
+        if (_loading)
+          Container(
+            alignment: Alignment.center,
+            child: const CircularProgressIndicator(
+              strokeWidth: 6,
+            ),
+          )
       ]),
     );
   }

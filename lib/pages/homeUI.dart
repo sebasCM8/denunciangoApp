@@ -25,7 +25,45 @@ class _HomeUIState extends State<HomeUI> {
     });
   }
 
-  void logoutBtn() {}
+  Future<void> logoutProc() async {
+    await UsuarioController.destroySession();
+    Navigator.pushNamedAndRemoveUntil(
+        context, '/inicioPage', (Route<dynamic> route) => false);
+  }
+
+  Future<void> confimarDialog(BuildContext context) async {
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text(
+              "Seguro que desea cerrrar sesion?",
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text(
+                    "NO",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  )),
+              TextButton(
+                  onPressed: () {
+                    logoutProc();
+                  },
+                  child: const Text(
+                    "SI SALIR",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: Colors.red),
+                  ))
+            ],
+          );
+        });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,15 +72,18 @@ class _HomeUIState extends State<HomeUI> {
       const SizedBox(
         height: 120,
         child: DrawerHeader(
-            decoration: BoxDecoration(color: Colors.blueGrey),
+            decoration: BoxDecoration(color: Colors.purple),
             child: Text(
               "Menu",
               style: TextStyle(color: Colors.white),
             )),
       ),
       ListTile(
-        title: const Text("Salir"),
-        onTap: logoutBtn,
+        title: const Text(
+          "Salir",
+          style: TextStyle(color: Colors.red),
+        ),
+        onTap: () => confimarDialog(context),
       ),
     ]));
 
