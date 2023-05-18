@@ -200,6 +200,13 @@ class _RegistroUIState extends State<RegistroUI> {
                   border: OutlineInputBorder()),
             ),
           ),
+        if (_loading)
+          Container(
+            alignment: Alignment.center,
+            child: const CircularProgressIndicator(
+              strokeWidth: 6,
+            ),
+          ),
       ];
     } else {
       formulario = [
@@ -211,7 +218,14 @@ class _RegistroUIState extends State<RegistroUI> {
               child: Container(
                   width: devSize.width * 0.75,
                   child: ElevatedButton(
-                      onPressed: signupBtn, child: const Text("INGRESAR"))))
+                      onPressed: signupBtn, child: const Text("INGRESAR")))),
+        if (_loading)
+          Container(
+            alignment: Alignment.center,
+            child: const CircularProgressIndicator(
+              strokeWidth: 6,
+            ),
+          ),
       ];
     }
 

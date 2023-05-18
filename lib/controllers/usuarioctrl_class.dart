@@ -146,7 +146,7 @@ class UsuarioController {
   static Future<ResponseResult> registrarUsr(Usuario usu) async {
     ResponseResult result;
     try {
-      Map<String, dynamic> theData = {"usu": usu.toMap()};
+      Map<String, dynamic> theData = usu.toMap();
       String theUrl = ApiEndpoints.apiRegistrarFin;
       final apiReq = await http.post(Uri.parse(theUrl),
           headers: <String, String>{
