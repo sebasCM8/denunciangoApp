@@ -1,9 +1,13 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:denunciango_app/controllers/usuarioctrl_class.dart';
 import 'package:denunciango_app/models/genericops_class.dart';
 import 'package:denunciango_app/models/resultresponse_class.dart';
 import 'package:denunciango_app/models/usuario_class.dart';
 import 'package:denunciango_app/pages/genericWidgets/formWidgets.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class InicioUI extends StatefulWidget {
   const InicioUI({super.key});
@@ -15,11 +19,12 @@ class InicioUI extends StatefulWidget {
 class _InicioUIState extends State<InicioUI> {
   final _emailCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
-  final _nombreCtrl = TextEditingController();
-  final _aPaternoCtrl = TextEditingController();
-  final _aMaternoCtrl = TextEditingController();
-  final _direccionCtrl = TextEditingController();
+
   final _ciCtrl = TextEditingController();
+  File? _imgFile;
+  String _imgStr = "";
+  ImagePicker _imagePicker = ImagePicker();
+
   String _msgErr = "";
   bool _loading = false;
   Usuario _usu = Usuario();
@@ -94,6 +99,66 @@ class _InicioUIState extends State<InicioUI> {
     });
   }
 
+// ======= METODOS REGISTRO =======
+  Future<void> selectImg() async {
+    ImageSource src = ImageSource.camera;
+    try {
+      XFile? img = await _imagePicker.pickImage(source: src, imageQuality: 2);
+      if (img == null) {
+        return;
+      }
+      _imgFile = File(img.path);
+      final bytes = await _imgFile!.readAsBytesSync();
+      setState(() {
+        _imgStr = base64Encode(bytes);
+        print("IMAGE SIZE: ${_imgStr.length}");
+      });
+    } catch (e) {
+      msgErrDialog(context, "Excepcion al cargar imagen");
+    }
+  }
+
+  Future<ResponseResult> signupProc() async {
+    ResponseResult result;
+    try {
+      if (!GenericOps.checkValidEntero(_ciCtrl.text)) {
+        result = ResponseResult.full(false, "Carnet no valido");
+        return result;
+      }
+      if (_imgStr == "") {
+        result =
+            ResponseResult.full(false, "Debe tomarse la foto para registrarse");
+        return result;
+      }
+
+      _usu.usuCI = _ciCtrl.text.trim();
+      result = await UsuarioController.checkCiImgUsr(_usu, _imgStr);
+    } catch (e) {
+      result =
+          ResponseResult.full(false, "Excepcion al intentar registrarse: $e");
+    }
+    return Future.delayed(const Duration(seconds: 1), () => result);
+  }
+
+  Future<void> siguienteBtn() async {
+    setState(() {
+      _loading = true;
+    });
+
+    _msgErr = "";
+    ResponseResult procResp = await signupProc();
+    if (procResp.ok) {
+      Navigator.pushNamed(context, "/registroPage", arguments: _usu);
+    } else {
+      _msgErr = procResp.msg;
+      msgErrDialog(context, _msgErr);
+    }
+
+    setState(() {
+      _loading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var devSize = MediaQuery.of(context).size;
@@ -114,17 +179,28 @@ class _InicioUIState extends State<InicioUI> {
     } else {
       formulario = [
         inputOne(_ciCtrl, "Carnet de identidad..", 15),
-        inputOne(_nombreCtrl, "Nombre....", 50),
-        inputOne(_aPaternoCtrl, "Apellido paterno..", 50),
-        inputOne(_aMaternoCtrl, "Apellido Materno..", 50),
-        inputOne(_direccionCtrl, "Direccion....", 100),
+        Container(
+          margin: const EdgeInsets.all(12),
+          alignment: Alignment.center,
+          decoration:
+              const BoxDecoration(color: Colors.purple, shape: BoxShape.circle),
+          child: IconButton(
+              onPressed: selectImg,
+              icon: const Icon(Icons.image, color: Colors.white)),
+        ),
+        if (_imgStr != "")
+          Container(
+            width: devSize.width * 0.8,
+            child: Image.file(_imgFile!),
+          ),
         if (!_loading)
           Align(
               alignment: Alignment.center,
               child: Container(
                   width: devSize.width * 0.75,
                   child: ElevatedButton(
-                      onPressed: loginBtn, child: const Text("REGISTRARME"))))
+                      onPressed: siguienteBtn,
+                      child: const Text("REGISTRARME"))))
       ];
     }
 
@@ -137,6 +213,9 @@ class _InicioUIState extends State<InicioUI> {
     return Scaffold(
       appBar: AppBar(title: const Text("Inicio")),
       body: Column(children: [
+        SizedBox(
+          height: devSize.height * 0.10,
+        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -146,6 +225,7 @@ class _InicioUIState extends State<InicioUI> {
                     : () {
                         setState(() {
                           _vista = 1;
+                          _usu = Usuario();
                         });
                       },
                 child: const Text("Ingresar")),
@@ -158,10 +238,14 @@ class _InicioUIState extends State<InicioUI> {
                     : () {
                         setState(() {
                           _vista = 2;
+                          _usu = Usuario();
                         });
                       },
                 child: const Text("Registrarme"))
           ],
+        ),
+        const SizedBox(
+          height: 20,
         ),
         lista,
         if (_loading)

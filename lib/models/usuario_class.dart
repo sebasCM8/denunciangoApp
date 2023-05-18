@@ -30,4 +30,17 @@ class Usuario {
     usuFechaBloqueo = usrData["usuFechaBloqueo"];
     usuFechaUltPass = usrData["usuFechaUltPass"];
   }
+
+  Map<String, dynamic> toMap() {
+    Map<String, dynamic> resp = {
+      "usuCI": usuCI,
+      "usuNombre": usuNombre,
+      "usuPaterno": usuPaterno,
+      "usuMaterno": usuMaterno,
+      "usuEmail": usuEmail,
+      "usuPass": usuPass,
+      "usuDireccion": usuDireccion,
+    };
+    return resp;
+  }
 }

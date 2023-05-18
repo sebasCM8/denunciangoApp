@@ -1,7 +1,9 @@
 import 'package:denunciango_app/models/apiendpoints_class.dart';
 import 'package:denunciango_app/models/cambiarpassresponse_class.dart';
+import 'package:denunciango_app/models/codverresponse_class.dart';
 import 'package:denunciango_app/models/resultresponse_class.dart';
 import 'package:denunciango_app/models/usuario_class.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -91,5 +93,76 @@ class UsuarioController {
     final prefs = await SharedPreferences.getInstance();
     String currentUsu = prefs.getString(cUSUEMAIL) ?? "";
     return currentUsu;
+  }
+
+  static Future<ResponseResult> checkCiImgUsr(Usuario usu, String img) async {
+    ResponseResult result;
+    try {
+      Map<String, dynamic> theData = {"ci": usu.usuCI, "imageusu": img};
+      String theUrl = ApiEndpoints.apiRegistrarPasoDos;
+      final apiReq = await http.post(Uri.parse(theUrl),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8'
+          },
+          body: jsonEncode(theData));
+      var apiResp = jsonDecode(apiReq.body);
+      result = ResponseResult();
+      result.getFromAPI(apiResp);
+      if (result.ok) {
+        usu.usuNombre = apiResp["data"]["nombre"];
+        usu.usuPaterno = apiResp["data"]["paterno"];
+        usu.usuMaterno = apiResp["data"]["materno"];
+      }
+    } catch (e) {
+      result = ResponseResult.full(false, "Excepcion: $e");
+    }
+
+    return result;
+  }
+
+  static Future<CodVerResponse> envCodCorreoUsr(Usuario usu) async {
+    CodVerResponse result = CodVerResponse();
+    try {
+      Map<String, dynamic> theData = {"email": usu.usuEmail};
+      String theUrl = ApiEndpoints.apiRegistrarPasoTres;
+      final apiReq = await http.post(Uri.parse(theUrl),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8'
+          },
+          body: jsonEncode(theData));
+      var apiResp = jsonDecode(apiReq.body);
+      result.resp = ResponseResult();
+      result.resp.getFromAPI(apiResp);
+      if (result.resp.ok) {
+        result.code = apiResp["data"];
+      }
+    } catch (e) {
+      result.resp = ResponseResult.full(false, "Excepcion: $e");
+    }
+
+    return result;
+  }
+
+  static Future<ResponseResult> registrarUsr(Usuario usu) async {
+    ResponseResult result;
+    try {
+      Map<String, dynamic> theData = {"usu": usu.toMap()};
+      String theUrl = ApiEndpoints.apiRegistrarFin;
+      final apiReq = await http.post(Uri.parse(theUrl),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8'
+          },
+          body: jsonEncode(theData));
+      var apiResp = jsonDecode(apiReq.body);
+      result = ResponseResult();
+      result.getFromAPI(apiResp);
+      if (result.ok) {
+        await createSession(usu.usuEmail);
+      }
+    } catch (e) {
+      result = ResponseResult.full(false, "Excepcion: $e");
+    }
+
+    return result;
   }
 }
