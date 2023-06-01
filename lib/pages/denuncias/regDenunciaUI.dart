@@ -1,12 +1,17 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:denunciango_app/controllers/denunciactrl_class.dart';
+import 'package:denunciango_app/controllers/usuarioctrl_class.dart';
+import 'package:denunciango_app/models/denuncia_class.dart';
+import 'package:denunciango_app/models/genericops_class.dart';
 import 'package:denunciango_app/models/gettdresponse_class.dart';
 import 'package:denunciango_app/models/resultresponse_class.dart';
 import 'package:denunciango_app/models/tipoDenuncia_class.dart';
 import 'package:denunciango_app/pages/genericWidgets/formWidgets.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:location/location.dart';
 
 class RegDenunciaUI extends StatefulWidget {
   const RegDenunciaUI({super.key});
@@ -28,6 +33,8 @@ class _RegDenunciaUIState extends State<RegDenunciaUI> {
   final int cMAXHEIGHT = 800;
   final int cMAXWIDTH = 1024;
   final int cMAXIMAGENES = 2;
+  final int cMINDESC = 64;
+  final int cMAXDESC = 512;
 
   List<File> _imagenes = [];
 
@@ -156,24 +163,92 @@ class _RegDenunciaUIState extends State<RegDenunciaUI> {
     ResponseResult result;
 
     try {
-      result = ResponseResult();
+      Denuncia denObj = Denuncia();
+      if (_tituloCtrl.text.trim() == "") {
+        result = ResponseResult.full(false, "Debe colocar titulo a la denucia");
+        return result;
+      }
+      if (_descCtrl.text.trim().length < cMINDESC ||
+          _descCtrl.text.trim().length > cMAXDESC) {
+        result = ResponseResult.full(false,
+            "La descripcion debe tener al menos $cMINDESC y maximo $cMAXDESC caracteres");
+        return result;
+      }
+      denObj.denTitulo = _tituloCtrl.text.trim();
+      denObj.denDescripcion = _descCtrl.text.trim();
+      denObj.denTipo = _tipoDenSelected;
+
+      if (_imagenes.isEmpty) {
+        result = ResponseResult.full(false, "Debe tomar almenos una foto");
+        return result;
+      }
+      List<String> denImagenes = [];
+      for (File f in _imagenes) {
+        final bytes = f.readAsBytesSync();
+        String imgStr = base64Encode(bytes);
+        denImagenes.add(imgStr);
+      }
+
+      bool hasPermission = await GenericOps.handleLocationPermission();
+      if (!hasPermission) {
+        result = ResponseResult.full(false, "Debe dar permiso de ubicacion");
+        return result;
+      }
+      Location lc = Location();
+      LocationData lcData = await lc.getLocation();
+      denObj.denLat = lcData.latitude.toString();
+      denObj.denLng = lcData.longitude.toString();
+
+      denObj.denUsu = await UsuarioController.getUsuLogged();
+
+      result = await DenunciaController.registrarDenuncia(denObj, denImagenes);
     } catch (e) {
       result = ResponseResult.full(false, "Excepcion: $e");
     }
 
-    return result;
+    return Future.delayed(const Duration(seconds: 1), () => result);
   }
 
   Future<void> registrarDen() async {
     setState(() {
       _loading = true;
     });
+    _msgErr = "";
 
     ResponseResult procResp = await regDenProc();
+    if (procResp.ok) {
+      Navigator.pop(context);
+    } else {
+      _msgErr = procResp.msg;
+      msgErrDialog(context, _msgErr);
+    }
 
     setState(() {
       _loading = false;
     });
+  }
+
+  Future<void> msgErrDialog(BuildContext context, String msg) async {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(
+              msg,
+              style: const TextStyle(color: Colors.red),
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text(
+                    "OK",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  ))
+            ],
+          );
+        });
   }
 
   @override
@@ -193,7 +268,7 @@ class _RegDenunciaUIState extends State<RegDenunciaUI> {
       body: Column(children: [
         tdDdnBtn,
         inputOne(_tituloCtrl, "Titulo de la denuncia...", 100),
-        inputTextArea(_descCtrl, "Descripcion de la denuncia......", 512),
+        inputTextArea(_descCtrl, "Descripcion de la denuncia......", cMAXDESC),
         imagesList(),
         Container(
           decoration:
