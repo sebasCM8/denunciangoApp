@@ -3,7 +3,6 @@ import 'package:denunciango_app/models/cambiarpassresponse_class.dart';
 import 'package:denunciango_app/models/codverresponse_class.dart';
 import 'package:denunciango_app/models/resultresponse_class.dart';
 import 'package:denunciango_app/models/usuario_class.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';

@@ -65,6 +65,10 @@ class _HomeUIState extends State<HomeUI> {
         });
   }
 
+  void verMisDenuncias() {
+    Navigator.pushNamed(context, "/verDenunciasPage");
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget myDrawer = Drawer(
@@ -77,6 +81,15 @@ class _HomeUIState extends State<HomeUI> {
               "Menu",
               style: TextStyle(color: Colors.white),
             )),
+      ),
+      ListTile(
+        title: const Text(
+          "Mis denuncias",
+        ),
+        onTap: verMisDenuncias,
+      ),
+      const SizedBox(
+        height: 50,
       ),
       ListTile(
         title: const Text(

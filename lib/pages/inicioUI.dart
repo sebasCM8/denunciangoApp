@@ -103,7 +103,7 @@ class _InicioUIState extends State<InicioUI> {
   Future<void> selectImg() async {
     ImageSource src = ImageSource.camera;
     try {
-      XFile? img = await _imagePicker.pickImage(source: src, imageQuality: 2);
+      XFile? img = await _imagePicker.pickImage(source: src, imageQuality: 15);
       if (img == null) {
         return;
       }

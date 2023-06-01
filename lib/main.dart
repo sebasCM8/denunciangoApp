@@ -1,5 +1,7 @@
 import 'package:denunciango_app/models/usuario_class.dart';
 import 'package:denunciango_app/pages/cambiarpassUI.dart';
+import 'package:denunciango_app/pages/denuncias/regDenunciaUI.dart';
+import 'package:denunciango_app/pages/denuncias/verdenunciasUI.dart';
 import 'package:denunciango_app/pages/homeUI.dart';
 import 'package:denunciango_app/pages/inicioUI.dart';
 import 'package:denunciango_app/pages/loadingUI.dart';
@@ -31,7 +33,9 @@ class MyApp extends StatelessWidget {
         '/inicioPage': (context) => const InicioUI(),
         '/homePage': (context) => const HomeUI(),
         '/cambiarPasswordPage':(context) => CambiarPassUI(usuEmail: ModalRoute.of(context)!.settings.arguments as String),
-        '/registroPage':(context) => RegistroUI(usu: ModalRoute.of(context)!.settings.arguments as Usuario)
+        '/registroPage':(context) => RegistroUI(usu: ModalRoute.of(context)!.settings.arguments as Usuario),
+        '/verDenunciasPage': (context) => const VerDenunciasUI(),
+        '/regDenunciaPage': (context) => const RegDenunciaUI()
       },
     );
   }
