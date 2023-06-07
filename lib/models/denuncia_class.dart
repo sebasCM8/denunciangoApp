@@ -1,8 +1,9 @@
+import 'package:denunciango_app/models/tipoDenuncia_class.dart';
+
 class Denuncia {
-  int denId = 0;
+  String denId = "";
   String denTitulo = "";
   String denDescripcion = "";
-  int denTipo = 0;
   String denUsu = "";
   int denEstado = 0;
   String denFecha = "";
@@ -11,12 +12,15 @@ class Denuncia {
   String denLng = "";
   String denImagenes = "";
 
+  TipoDenuncia denTd = TipoDenuncia();
+  String denEstTitulo = "";
+
   Map<String, dynamic> toDbMap() {
     Map<String, dynamic> denData = {
       "denId": denId,
       "denTitulo": denTitulo,
       "denDescripcion": denDescripcion,
-      "denTipo": denTipo,
+      "denTipo": denTd.tdId,
       "denUsu": denUsu,
       "denEstado": denEstado,
       "denFecha": denFecha,
@@ -32,7 +36,6 @@ class Denuncia {
     denId = denData["denId"];
     denTitulo = denData["denTitulo"];
     denDescripcion = denData["denDescripcion"];
-    denTipo = denData["denTipo"];
     denUsu = denData["denUsu"];
     denEstado = denData["denEstado"];
     denFecha = denData["denFecha"];
@@ -40,5 +43,9 @@ class Denuncia {
     denLat = denData["denLat"];
     denLng = denData["denLng"];
     denImagenes = denData["denImagenes"];
+
+    denTd.tdId = denData["denTipo"];
+    denTd.tdTitulo = denData["denTdTitulo"];
+    denEstTitulo = denData["denEstTitulo"];
   }
 }

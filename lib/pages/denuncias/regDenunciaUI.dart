@@ -176,7 +176,7 @@ class _RegDenunciaUIState extends State<RegDenunciaUI> {
       }
       denObj.denTitulo = _tituloCtrl.text.trim();
       denObj.denDescripcion = _descCtrl.text.trim();
-      denObj.denTipo = _tipoDenSelected;
+      denObj.denTd.tdId = _tipoDenSelected;
 
       if (_imagenes.isEmpty) {
         result = ResponseResult.full(false, "Debe tomar almenos una foto");
@@ -265,7 +265,7 @@ class _RegDenunciaUIState extends State<RegDenunciaUI> {
       appBar: AppBar(
         title: const Text("Registrar denuncia"),
       ),
-      body: Column(children: [
+      body: ListView(children: [
         tdDdnBtn,
         inputOne(_tituloCtrl, "Titulo de la denuncia...", 100),
         inputTextArea(_descCtrl, "Descripcion de la denuncia......", cMAXDESC),

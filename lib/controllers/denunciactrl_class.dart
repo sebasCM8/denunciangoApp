@@ -1,8 +1,12 @@
+import 'package:denunciango_app/controllers/usuarioctrl_class.dart';
 import 'package:denunciango_app/models/apiendpoints_class.dart';
 import 'package:denunciango_app/models/denuncia_class.dart';
+import 'package:denunciango_app/models/etadoDenuncia_class.dart';
 import 'package:denunciango_app/models/gettdresponse_class.dart';
 import 'package:denunciango_app/models/resultresponse_class.dart';
 import 'package:denunciango_app/models/tipoDenuncia_class.dart';
+import 'package:denunciango_app/models/usuDen_class.dart';
+import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -42,6 +46,45 @@ class DenunciaController {
         body: jsonEncode(theData));
     var apiResp = jsonDecode(apiReq.body);
     result.getFromAPI(apiResp);
+
+    return result;
+  }
+
+  static Future<UsuDenResponse> obtenerUsuDen() async {
+    UsuDenResponse result = UsuDenResponse();
+    result.resp = ResponseResult();
+
+    Map<String, dynamic> theData = {
+      "usuEmail": await UsuarioController.getUsuLogged()
+    };
+    String theUrl = ApiEndpoints.apiUsuarioDenuncias;
+
+    final apiReq = await http.post(Uri.parse(theUrl),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: jsonEncode(theData));
+    var apiResp = jsonDecode(apiReq.body);
+    result.resp.getFromAPI(apiResp);
+    if (result.resp.ok) {
+      for (var item in apiResp["data"]["denuncias"]) {
+        Denuncia den = Denuncia();
+        den.fromDbMap(item);
+        result.denList.add(den);
+      }
+
+      for (var item in apiResp["data"]["ests"]) {
+        EstadoDenuncia est = EstadoDenuncia();
+        est.getFromDb(item);
+        result.estList.add(est);
+      }
+
+      for (var item in apiResp["data"]["tds"]) {
+        TipoDenuncia td = TipoDenuncia();
+        td.getFromDb(item);
+        result.tdList.add(td);
+      }
+    }
 
     return result;
   }
