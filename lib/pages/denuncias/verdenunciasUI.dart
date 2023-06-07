@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:denunciango_app/controllers/denunciactrl_class.dart';
 import 'package:denunciango_app/models/denuncia_class.dart';
 import 'package:denunciango_app/models/etadoDenuncia_class.dart';
@@ -27,6 +29,8 @@ class _VerDenunciasUIState extends State<VerDenunciasUI> {
   String _fFin = "";
   DateTime? dIni;
   DateTime? dFin;
+
+  bool _verFiltro = true;
 
   bool _loading = false;
   String _msgErr = "";
@@ -129,51 +133,61 @@ class _VerDenunciasUIState extends State<VerDenunciasUI> {
       child: ListView.builder(
           itemCount: _denuncias.length,
           itemBuilder: (context, index) {
-            return Container(
-              //height: devSize.height * 0.20,
-              margin:
-                  const EdgeInsets.only(top: 8, bottom: 8, left: 12, right: 12),
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: const [
-                    BoxShadow(
-                        color: Colors.blueGrey,
-                        offset: Offset(1, 1),
-                        blurRadius: 4),
-                    BoxShadow(
-                        color: Colors.blueGrey,
-                        offset: Offset(-1, -1),
-                        blurRadius: 4)
-                  ],
-                  border: Border.all(
-                      color: Colors.purple, width: 2, style: BorderStyle.solid),
-                  borderRadius: const BorderRadius.all(Radius.circular(11))),
-              child: Column(children: [
-                Container(
-                    padding: const EdgeInsets.all(10),
-                    alignment: Alignment.topLeft,
-                    child: Text(
-                      _denuncias[index].denTitulo,
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.w600),
-                    )),
-                Container(
-                    alignment: Alignment.centerLeft,
-                    padding: const EdgeInsets.only(left: 10, top: 4, bottom: 4),
-                    child: Text(
-                        "Tipo: ${_denuncias[index].denTd.tdTitulo.toString()}",
-                        style: const TextStyle(fontSize: 16))),
-                Container(
-                    alignment: Alignment.centerLeft,
-                    padding: const EdgeInsets.only(left: 10, top: 4, bottom: 4),
-                    child: Text("Estado: ${_denuncias[index].denEstTitulo}")),
-                Container(
-                    padding: const EdgeInsets.all(8),
-                    alignment: Alignment.bottomRight,
-                    child: Text(
-                        "${_denuncias[index].denFecha} - ${_denuncias[index].denHora}",
-                        style: const TextStyle(fontSize: 16)))
-              ]),
+            return InkWell(
+              onTap: () {
+                Navigator.pushNamed(context, "/verDenDetallePage",
+                    arguments: _denuncias[index]);
+              },
+              child: Container(
+                //height: devSize.height * 0.20,
+                margin: const EdgeInsets.only(
+                    top: 8, bottom: 8, left: 12, right: 12),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: const [
+                      BoxShadow(
+                          color: Colors.blueGrey,
+                          offset: Offset(1, 1),
+                          blurRadius: 4),
+                      BoxShadow(
+                          color: Colors.blueGrey,
+                          offset: Offset(-1, -1),
+                          blurRadius: 4)
+                    ],
+                    border: Border.all(
+                        color: Colors.purple,
+                        width: 2,
+                        style: BorderStyle.solid),
+                    borderRadius: const BorderRadius.all(Radius.circular(11))),
+                child: Column(children: [
+                  Container(
+                      padding: const EdgeInsets.all(10),
+                      alignment: Alignment.topLeft,
+                      child: Text(
+                        _denuncias[index].denTitulo,
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w600),
+                      )),
+                  Container(
+                      alignment: Alignment.centerLeft,
+                      padding:
+                          const EdgeInsets.only(left: 10, top: 4, bottom: 4),
+                      child: Text(
+                          "Tipo: ${_denuncias[index].denTd.tdTitulo.toString()}",
+                          style: const TextStyle(fontSize: 16))),
+                  Container(
+                      alignment: Alignment.centerLeft,
+                      padding:
+                          const EdgeInsets.only(left: 10, top: 4, bottom: 4),
+                      child: Text("Estado: ${_denuncias[index].denEstTitulo}")),
+                  Container(
+                      padding: const EdgeInsets.all(8),
+                      alignment: Alignment.bottomRight,
+                      child: Text(
+                          "${_denuncias[index].denFecha} - ${_denuncias[index].denHora}",
+                          style: const TextStyle(fontSize: 16)))
+                ]),
+              ),
             );
           }),
     );
@@ -266,53 +280,72 @@ class _VerDenunciasUIState extends State<VerDenunciasUI> {
           child: const Icon(Icons.add)),
       body: Column(
         children: [
-          Container(
-            margin: const EdgeInsets.only(left: 15, right: 15, top: 5),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.only(right: 5),
-                  child: const Text("Del"),
-                ),
-                TextButton(
-                    onPressed: () async {
-                      dIni = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime(2023),
-                          lastDate: DateTime.now());
-                      if (dIni != null) {
-                        setState(() {
-                          _fIni = dIni.toString().split(" ")[0];
-                          applyFilter();
-                        });
-                      }
-                    },
-                    child: Text(_fIni == "" ? "toca" : _fIni)),
-                Container(
-                  padding: const EdgeInsets.all(5),
-                  child: const Text("al"),
-                ),
-                TextButton(
-                    onPressed: () async {
-                      dFin = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime(2023),
-                          lastDate: DateTime.now());
-                      if (dFin != null) {
-                        setState(() {
-                          _fFin = dFin.toString().split(" ")[0];
-                          applyFilter();
-                        });
-                      }
-                    },
-                    child: Text(_fFin == "" ? "toca" : _fFin)),
-              ],
+          if (_verFiltro)
+            Container(
+              margin: const EdgeInsets.only(left: 15, right: 15, top: 5),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.only(right: 5),
+                    child: const Text("Del"),
+                  ),
+                  TextButton(
+                      onPressed: () async {
+                        dIni = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime(2023),
+                            lastDate: DateTime.now());
+                        if (dIni != null) {
+                          setState(() {
+                            _fIni = dIni.toString().split(" ")[0];
+                            applyFilter();
+                          });
+                        }
+                      },
+                      child: Text(_fIni == "" ? "toca" : _fIni)),
+                  Container(
+                    padding: const EdgeInsets.all(5),
+                    child: const Text("al"),
+                  ),
+                  TextButton(
+                      onPressed: () async {
+                        dFin = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime(2023),
+                            lastDate: DateTime.now());
+                        if (dFin != null) {
+                          setState(() {
+                            _fFin = dFin.toString().split(" ")[0];
+                            applyFilter();
+                          });
+                        }
+                      },
+                      child: Text(_fFin == "" ? "toca" : _fFin)),
+                ],
+              ),
             ),
+          if (_verFiltro) tdDdnBtn,
+          if (_verFiltro) estDdnBtn,
+          Row(
+            children: [
+              Container(
+                margin: const EdgeInsets.only(left: 15, right: 8),
+                child: const Text(
+                  "Mostrar filtro",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+              Checkbox(
+                  value: _verFiltro,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      _verFiltro = !_verFiltro;
+                    });
+                  })
+            ],
           ),
-          tdDdnBtn,
-          estDdnBtn,
           denunciasList(),
           if (_loading)
             Container(

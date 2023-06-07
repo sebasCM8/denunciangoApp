@@ -1,5 +1,6 @@
 import 'package:denunciango_app/controllers/usuarioctrl_class.dart';
 import 'package:denunciango_app/models/apiendpoints_class.dart';
+import 'package:denunciango_app/models/denimgresponse_class.dart';
 import 'package:denunciango_app/models/denuncia_class.dart';
 import 'package:denunciango_app/models/etadoDenuncia_class.dart';
 import 'package:denunciango_app/models/gettdresponse_class.dart';
@@ -83,6 +84,27 @@ class DenunciaController {
         TipoDenuncia td = TipoDenuncia();
         td.getFromDb(item);
         result.tdList.add(td);
+      }
+    }
+
+    return result;
+  }
+
+  static Future<DenImgResponse> obtenerDenImagenes(String denId) async {
+    DenImgResponse result = DenImgResponse();
+
+    Map<String, dynamic> theData = {"denId": denId};
+    String theUrl = ApiEndpoints.apiDenImagenes;
+    final apiReq = await http.post(Uri.parse(theUrl),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: jsonEncode(theData));
+    var apiResp = jsonDecode(apiReq.body);
+    result.resp.getFromAPI(apiResp);
+    if (result.resp.ok) {
+      for (var item in apiResp["data"]["denImagenes"]) {
+        result.imgns.add(item);
       }
     }
 

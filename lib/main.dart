@@ -1,5 +1,8 @@
+import 'package:denunciango_app/models/denuncia_class.dart';
 import 'package:denunciango_app/models/usuario_class.dart';
 import 'package:denunciango_app/pages/cambiarpassUI.dart';
+import 'package:denunciango_app/pages/denuncias/denDetalleUI.dart';
+import 'package:denunciango_app/pages/denuncias/imageviewUI.dart';
 import 'package:denunciango_app/pages/denuncias/regDenunciaUI.dart';
 import 'package:denunciango_app/pages/denuncias/verdenunciasUI.dart';
 import 'package:denunciango_app/pages/homeUI.dart';
@@ -35,7 +38,9 @@ class MyApp extends StatelessWidget {
         '/cambiarPasswordPage':(context) => CambiarPassUI(usuEmail: ModalRoute.of(context)!.settings.arguments as String),
         '/registroPage':(context) => RegistroUI(usu: ModalRoute.of(context)!.settings.arguments as Usuario),
         '/verDenunciasPage': (context) => const VerDenunciasUI(),
-        '/regDenunciaPage': (context) => const RegDenunciaUI()
+        '/regDenunciaPage': (context) => const RegDenunciaUI(),
+        '/verDenDetallePage':(context) => DenDetalleUI(den: ModalRoute.of(context)!.settings.arguments as Denuncia,),
+        '/imageViewPage':(context) => ImageViewUI(imgStr: ModalRoute.of(context)!.settings.arguments as String)
       },
     );
   }
