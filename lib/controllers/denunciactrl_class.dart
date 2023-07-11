@@ -7,7 +7,6 @@ import 'package:denunciango_app/models/gettdresponse_class.dart';
 import 'package:denunciango_app/models/resultresponse_class.dart';
 import 'package:denunciango_app/models/tipoDenuncia_class.dart';
 import 'package:denunciango_app/models/usuDen_class.dart';
-import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 

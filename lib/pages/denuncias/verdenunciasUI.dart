@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:denunciango_app/controllers/denunciactrl_class.dart';
 import 'package:denunciango_app/models/denuncia_class.dart';
 import 'package:denunciango_app/models/etadoDenuncia_class.dart';
@@ -20,7 +18,7 @@ class _VerDenunciasUIState extends State<VerDenunciasUI> {
   List<Denuncia> _denuncias = [];
 
   List<TipoDenuncia> _tiposDenuncia = [];
-  int _tipoDenSelected = 0;
+  String _tipoDenSelected = "0";
 
   List<EstadoDenuncia> _estadosDenuncia = [];
   int _estadoDenSelected = -1;
@@ -43,7 +41,7 @@ class _VerDenunciasUIState extends State<VerDenunciasUI> {
 
   Widget tdDropDownBtn() {
     List<DropdownMenuItem> opts = [];
-    opts.add(const DropdownMenuItem(value: 0, child: Text("TODOS")));
+    opts.add(const DropdownMenuItem(value: "0", child: Text("TODOS")));
     for (TipoDenuncia td in _tiposDenuncia) {
       DropdownMenuItem opt =
           DropdownMenuItem(value: td.tdId, child: Text(td.tdTitulo.trim()));
@@ -225,7 +223,7 @@ class _VerDenunciasUIState extends State<VerDenunciasUI> {
       }
     }
 
-    if (_tipoDenSelected != 0) {
+    if (_tipoDenSelected != "0") {
       List<Denuncia> srcList =
           seFiltro ? List.from(_denuncias) : _denunciasFull;
       seFiltro = true;

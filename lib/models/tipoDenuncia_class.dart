@@ -1,11 +1,11 @@
 class TipoDenuncia {
-  int tdId = 0;
+  String tdId = "";
   String tdTitulo = "";
 
   TipoDenuncia();
 
   void getFromDb(Map<String, dynamic> tdData) {
-    tdId = int.parse(tdData["tdId"]);
+    tdId = tdData["tdId"];
     tdTitulo = tdData["tdTitulo"];
   }
 }

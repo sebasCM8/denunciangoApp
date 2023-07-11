@@ -58,7 +58,7 @@ class _RegistroUIState extends State<RegistroUI> {
     return Future.delayed(const Duration(seconds: 2), () => result);
   }
 
-  Future<void> envCodBt() async {
+  Future<void> envCodBtn() async {
     setState(() {
       _loading = true;
     });
@@ -180,7 +180,7 @@ class _RegistroUIState extends State<RegistroUI> {
               child: Container(
                   width: devSize.width * 0.75,
                   child: ElevatedButton(
-                      onPressed: envCodBt,
+                      onPressed: envCodBtn,
                       child: const Text("Enviar Codigo")))),
         if (_setCode)
           Container(

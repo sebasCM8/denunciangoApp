@@ -25,7 +25,7 @@ class _RegDenunciaUIState extends State<RegDenunciaUI> {
   String _msgErr = "";
 
   List<TipoDenuncia> _tiposDenuncia = [];
-  int _tipoDenSelected = 0;
+  String _tipoDenSelected = "";
 
   final _tituloCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
