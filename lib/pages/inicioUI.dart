@@ -88,6 +88,16 @@ class _InicioUIState extends State<InicioUI> {
     _msgErr = "";
     ResponseResult procResp = await _loginProc();
     if (procResp.ok) {
+      try {
+        ResponseResult tknResp =
+            await UsuarioController.registrarTokenDisp(_emailCtrl.text);
+        if (!tknResp.ok) {
+          print("Excepcion al registrar token ${tknResp.msg}");
+        }
+      } catch (e) {
+        print("Excepcion al registrar token $e");
+      }
+
       Navigator.pushReplacementNamed(context, "/homePage");
     } else {
       _msgErr = procResp.msg;

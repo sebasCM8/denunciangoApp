@@ -3,6 +3,7 @@ import 'package:denunciango_app/models/cambiarpassresponse_class.dart';
 import 'package:denunciango_app/models/codverresponse_class.dart';
 import 'package:denunciango_app/models/resultresponse_class.dart';
 import 'package:denunciango_app/models/usuario_class.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -158,6 +159,28 @@ class UsuarioController {
       if (result.ok) {
         await createSession(usu.usuEmail);
       }
+    } catch (e) {
+      result = ResponseResult.full(false, "Excepcion: $e");
+    }
+
+    return result;
+  }
+
+  static Future<ResponseResult> registrarTokenDisp(String usuEmail) async {
+    ResponseResult result;
+    try {
+      final fcmToken = await FirebaseMessaging.instance.getToken();
+
+      Map<String, dynamic> theData = {"usuEmail": usuEmail, "usuToken": fcmToken};
+      String theUrl = ApiEndpoints.apiRegistrarToken;
+      final apiReq = await http.post(Uri.parse(theUrl),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8'
+          },
+          body: jsonEncode(theData));
+      var apiResp = jsonDecode(apiReq.body);
+      result = ResponseResult();
+      result.getFromAPI(apiResp);
     } catch (e) {
       result = ResponseResult.full(false, "Excepcion: $e");
     }

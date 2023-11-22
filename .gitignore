@@ -45,3 +45,5 @@ app.*.map.json
 
 #MY IGNORES
 apiendpoints_class.dart
+google-services.json
+firebase_options.dart

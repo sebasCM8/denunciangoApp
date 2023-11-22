@@ -102,6 +102,16 @@ class _RegistroUIState extends State<RegistroUI> {
 
     ResponseResult procResp = await signupProc();
     if (procResp.ok) {
+      try {
+        ResponseResult tknResp =
+            await UsuarioController.registrarTokenDisp(widget.usu.usuEmail);
+        if (!tknResp.ok) {
+          print("Excepcion al registrar token ${tknResp.msg}");
+        }
+      } catch (e) {
+        print("Excepcion al registrar token $e");
+      }
+
       Navigator.pushNamedAndRemoveUntil(
           context, '/homePage', (Route<dynamic> route) => false);
     } else {
